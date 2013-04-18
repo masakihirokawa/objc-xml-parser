@@ -10,15 +10,6 @@
 
 @implementation ViewController
 
-UITextView *_textView;
-
-- (void)didReceiveMemoryWarning
-{
-  [super didReceiveMemoryWarning];
-}
-
-#pragma mark - View lifecycle
-
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
@@ -31,19 +22,21 @@ UITextView *_textView;
 //テキストビューの初期化
 - (void)initTextView
 {
-	//テキストビューを空欄にする
-	_textView.text = @"";
-  //編集不可に設定
-	_textView.editable = NO;
   //
-  [self.view addSubview:_textView];
+  self.textView = [[UITextView alloc] initWithFrame:CGRectMake(30, 30, 260, 508)];
+	//テキストビューを空欄にする
+	self.textView.text = @"";
+  //テキストビューを編集不可に設定
+	self.textView.editable = NO;
+  //テキストビューを画面に追加
+  [self.view addSubview:self.textView];
 }
 
 //URLを指定してXMLパーサーを作る
 - (void)setXMLParser
 {
   //XMLを読み込む
-	NSURL *myURL = [NSURL URLWithString:@"sample.xml"];
+	NSURL *myURL = [NSURL URLWithString:@"http://dolice.net/sample/ios/XMLParser/sample.xml"];
   //XMLパーサを初期化
 	NSXMLParser *myParser = [[NSXMLParser alloc] initWithContentsOfURL:myURL];
   //デリゲート指定
@@ -59,55 +52,48 @@ UITextView *_textView;
 	nowTagStr = @"";
 }
 
+//テキストビューに、タグ名と、price属性を追加する
 - (void)parser:(NSXMLParser *)parser
 didStartElement:(NSString *)elementName
   namespaceURI:(NSString *)namespaceURI
  qualifiedName:(NSString *)qName
     attributes:(NSDictionary *)attributeDict
 {
-  //開始タグが"sweets"だったら
-  if ([elementName isEqualToString:@"sweets"]) {
+  //開始タグが「game」だったら
+  if ([elementName isEqualToString:@"game"]) {
 		//解析中タグに設定
 		nowTagStr = [NSString stringWithString:elementName];
 		//テキストバッファの初期化
 		txtBuffer = @"";
-		// テキストビューに、タグ名と、price属性を追加する
-		_textView.text = [_textView.text stringByAppendingFormat:
-                       @"タグ名=[%@]\n 属性 price=[%@]",
-                       elementName, [attributeDict objectForKey:@"price"]];
+		//テキストビューに、タグ名と、price属性を追加する
+		self.textView.text = [self.textView.text stringByAppendingFormat:
+                          @"タグ名=[%@]\n 属性 price=[%@]",
+                          elementName, [attributeDict objectForKey:@"price"]];
 	}
 }
 
+//テキストバッファに文字を追加する
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
 {
-	// 解析中のタグが"sweets"だったら
-  if ([nowTagStr isEqualToString:@"sweets"]) {
-		// テキストバッファに文字を追加する
+	//解析中のタグが「game」だったら
+  if ([nowTagStr isEqualToString:@"game"]) {
+		//テキストバッファに文字を追加する
 		txtBuffer = [txtBuffer stringByAppendingString:string];
 	}
 }
 
+//テキストビューにテキストバッファの文字を追加する
 - (void)parser:(NSXMLParser *)parser
  didEndElement:(NSString *)elementName
   namespaceURI:(NSString *)namespaceURI
  qualifiedName:(NSString *)qName
 {
-	// 終了タグが"sweets"だったら
-  if ([elementName isEqualToString:@"sweets"]) {
-		// テキストビューにテキストバッファの文字を追加する
-		_textView.text = [_textView.text stringByAppendingFormat:
-                       @"\n 要素=[%@]\n\n", txtBuffer];
+	//終了タグが「game」だったら
+  if ([elementName isEqualToString:@"game"]) {
+		//テキストビューにテキストバッファの文字を追加する
+		self.textView.text = [self.textView.text stringByAppendingFormat:
+                          @"\n 要素=[%@]\n\n", txtBuffer];
 	}
-}
-
-- (void)viewDidUnload
-{
-  [super viewDidUnload];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-  return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
 
 @end

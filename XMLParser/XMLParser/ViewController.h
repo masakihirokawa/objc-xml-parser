@@ -13,6 +13,6 @@
   NSString *txtBuffer;
 }
 
-@property (weak, nonatomic) IBOutlet UITextView *textView;
+@property (strong, nonatomic) UITextView *textView;
 
 @end
